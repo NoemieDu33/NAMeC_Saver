@@ -1,0 +1,5 @@
+setup.py
+NAMeCSaverCam.egg-info/PKG-INFO
+NAMeCSaverCam.egg-info/SOURCES.txt
+NAMeCSaverCam.egg-info/dependency_links.txt
+NAMeCSaverCam.egg-info/top_level.txt

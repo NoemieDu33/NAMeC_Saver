@@ -6,5 +6,5 @@ img = cam.testresized
 # cam.show_image(step2)
 
 mask = cam.process_image_green(img)
-step2 = cam.get_green_from_img(img, mask)
+step2 = cam.get_green_from_img_new(img, mask)
 cam.show_image(step2)

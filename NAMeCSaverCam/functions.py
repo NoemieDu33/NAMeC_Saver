@@ -14,9 +14,9 @@ import math
 # def take_picture():
 #     array = picam2.capture_array()
 #     return array
-
-test_img = cv.imread("vert.jpg")
-testresized = img = cv.resize(test_img, (0,0), fx = 0.2, fy = 0.2)
+test_img = cv.imread("both.png")
+#test_img = cv.imread("20240302_124156.jpg")
+testresized = test_img #= cv.resize(test_img, (0,0), fx = 0.2, fy = 0.2)
 def process_image_circle(src):
     #redimensionne l'img, on pourra le retirer quand on réglera la résolution de la picamera
     src = cv.resize(src, (0,0), fx = 1.5, fy = 1.5)
@@ -91,7 +91,7 @@ def process_image_green(src):
     return mask_green
 
 
-def get_green_from_img(src, mask):
+def get_green_from_img_old(src, mask):
 
     # find contours in the green mask
     contours_green, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
@@ -140,3 +140,42 @@ def get_green_from_img(src, mask):
             
     return src
 
+def get_green_from_img_new(src, mask):
+
+    gen_dir = 0
+
+    # find contours in the green mask
+    contours_green, _ = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    # loop through the green contours and draw a rectangle around them
+    liste_directions = []
+    general_direction = 0 # -1 = gauche, 0 = droite et gauche, 1 = droite. 
+
+    for cnt in contours_green:
+        contour_area = cv.contourArea(cnt)
+        if contour_area > 1000: # Si faux positif: augmenter, si faux négatif: réduire. Default: 1000
+            x, y, w, h = cv.boundingRect(cnt)
+
+            direction = 0 #positif = droite, negatif = gauche, 0 = centre 
+
+            for decal in range(1,6):
+                if sum(src[y+(h//2),x+w+decal])<10:
+                    direction+=1
+                elif sum(src[y+(h//2),x-decal])<10:
+                    direction-=1
+                
+            gen_dir += direction
+        
+
+            cv.rectangle(src, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv.putText(src, 
+                       "gauche" if direction>0 else ("droite" if direction<0 else "centre"), 
+                       (x, y-10), 
+                       cv.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+            
+            # cv.circle(src, center_of_rectangle, 4, (255, 0, 0), 4)
+            # cv.line(src, (src.shape[1]//2, src.shape[0]), center_of_rectangle,(0,0,255),2)
+    
+    if abs(gen_dir)<2: 
+        cv.putText(src, "droite et gauche", (50,300), cv.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,255), 2)
+
+    return src
